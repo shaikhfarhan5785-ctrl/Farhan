@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FSmarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f172a;           /* deep slate */
+      --bg-2:#111827;         /* header darker */
+      --accent:#22c55e;       /* green */
+      --accent-2:#16a34a;
+      --text:#e5e7eb;         /* light */
+      --muted:#9ca3af;        /* muted */
+      --card:#0b1220;         /* card */
+      --chip:#1f2937;
+      --warn:#f59e0b;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg));
+      color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    /* Header */
+    .header{
+      position:sticky;top:0;z-index:50;background:var(--bg-2);
+      box-shadow:var(--shadow);border-bottom:1px solid #1f2937
+    }
+    .nav{display:flex;align-items:center;gap:16px;padding:10px 16px;max-width:1200px;margin:0 auto}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:24px;letter-spacing:.2px}
+    .logo-badge{background:var(--accent);color:#04120a;padding:4px 8px;border-radius:10px;font-size:12px;font-weight:800}
+    .ship-to{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+    .search{flex:1;display:flex;align-items:center;border-radius:999px;overflow:hidden;background:#0b1220;border:1px solid #1f2937}
+    .search input{flex:1;background:transparent;border:0;color:var(--text);padding:12px 14px;outline:none;font-size:14px}
+    .search button{background:var(--accent);border:0;padding:12px 16px;font-weight:700;border-left:1px solid #064e3b;cursor:pointer}
+    .actions{display:flex;align-items:center;gap:14px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid #1f2937;background:#0c1425;cursor:pointer}
+    .btn:hover{transform:translateY(-1px)}
+    .cart-count{background:var(--warn);color:#111827;border-radius:999px;padding:2px 7px;font-size:12px;font-weight:800}
+
+    /* Layout */
+    .wrap{max-width:1200px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:260px 1fr;gap:18px}
+    @media (max-width: 900px){.wrap{grid-template-columns:1fr}}
+
+    /* Sidebar */
+    .sidebar{background:var(--card);border:1px solid #1f2937;border-radius:var(--radius);padding:14px}
+    .side-title{font-weight:700;margin:6px 0 10px;font-size:14px}
+    .chip{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border:1px solid #1f2937;border-radius:999px;padding:8px 12px;margin:6px 6px 0 0;font-size:12px;cursor:pointer}
+    .chip input{accent-color:var(--accent)}
+
+    /* Hero */
+    .hero{background:radial-gradient(1200px 400px at 20% -10%, rgba(34,197,94,.25), transparent 60%),
+           radial-gradient(800px 300px at 120% -20%, rgba(59,130,246,.2), transparent 60%),
+           var(--card);
+          border:1px solid #1f2937;border-radius:var(--radius);padding:18px;display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:center}
+    .hero h1{margin:0;font-size:28px}
+    .hero p{color:var(--muted)}
+    @media (max-width:900px){.hero{grid-template-columns:1fr}}
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    @media (max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:520px){.grid{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+    .card .img{aspect-ratio:4/3;background:#0a0f1c;display:flex;align-items:center;justify-content:center}
+    .card h3{font-size:14px;margin:10px 12px 6px}
+    .price{margin:0 12px 12px;font-weight:800}
+    .strike{color:var(--muted);text-decoration:line-through;font-weight:500;margin-left:8px}
+    .add{margin:0 12px 12px;padding:10px;border-radius:12px;border:1px solid #1f2937;background:#0c1425;cursor:pointer}
+    .add:hover{background:#101a2d}
+
+    /* Footer */
+    footer{margin:30px 0;color:var(--muted);text-align:center;font-size:12px}
+
+    /* Cart Drawer */
+    .drawer{position:fixed;inset:0;pointer-events:none}
+    .drawer.open{pointer-events:auto}
+    .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0;transition:.2s}
+    .drawer.open .backdrop{opacity:1}
+    .panel{position:absolute;right:0;top:0;height:100%;width:380px;max-width:100%;background:var(--card);border-left:1px solid #1f2937;transform:translateX(100%);transition:.25s ease;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .drawer.open .panel{transform:translateX(0)}
+    .panel header{display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid #1f2937}
+    .cart-items{flex:1;overflow:auto;padding:10px}
+    .cart-item{display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center;border:1px solid #1f2937;background:#0b1220;border-radius:12px;padding:8px;margin-bottom:10px}
+    .cart-item img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+    .qty{display:inline-flex;gap:6px;align-items:center}
+    .qty button{width:26px;height:26px;border-radius:8px;border:1px solid #1f2937;background:#101a2d;color:var(--text);cursor:pointer}
+    .panel footer{border-top:1px solid #1f2937;padding:12px}
+    .checkout{width:100%;padding:12px;border-radius:12px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));font-weight:800;cursor:pointer}
+
+    /* Utility */
+    .muted{color:var(--muted)}
+    .row{display:flex;align-items:center;gap:10px}
+    .space{flex:1}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="nav">
+      <div class="logo" aria-label="FSmarket home">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M7 9l5 3 5-3" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        FSmarket <span class="logo-badge">FAST</span>
+      </div>
+
+      <div class="ship-to" title="Deliver to">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2a7 7 0 017 7c0 5-7 13-7 13S5 14 5 9a7 7 0 017-7zm0 9.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="1.4"/></svg>
+        <span id="region">Deliver to you</span>
+      </div>
+
+      <form class="search" onsubmit="event.preventDefault(); filterProducts()" role="search" aria-label="Search products">
+        <input id="q" type="search" placeholder="Search FSmarket" aria-label="Search" />
+        <button type="submit">Search</button>
+      </form>
+
+      <div class="actions">
+        <button class="btn" onclick="toggleCart(true)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 3h2l2.5 12.5a2 2 0 002 1.5h7a2 2 0 002-1.5L21 7H6" stroke="currentColor" stroke-width="1.4"/></svg>
+          Cart <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="btn" onclick="alert('Demo only — authentication not wired.')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zM3 22a9 9 0 0118 0" stroke="currentColor" stroke-width="1.4"/></svg>
+          Sign in
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Filters">
+      <div class="side-section">
+        <div class="side-title">Departments</div>
+        <div id="departments"></div>
+      </div>
+      <div class="side-section" style="margin-top:12px">
+        <div class="side-title">Price</div>
+        <label class="chip"><input type="radio" name="p" value="all" checked onchange="applyFilters()"> All</label>
+        <label class="chip"><input type="radio" name="p" value="lt25" onchange="applyFilters()"> Under ₹2,000</label>
+        <label class="chip"><input type="radio" name="p" value="25to50" onchange="applyFilters()"> ₹2,000–₹5,000</label>
+        <label class="chip"><input type="radio" name="p" value="gt50" onchange="applyFilters()"> Over ₹5,000</label>
+      </div>
+    </aside>
+
+    <section>
+      <!-- Hero -->
+      <div class="hero">
+        <div>
+          <h1>Welcome to FSmarket</h1>
+          <p>Your all‑in‑one marketplace. Fast delivery, sharp prices, and a clean, modern shopping experience.</p>
+          <div class="row" style="margin-top:12px">
+            <button class="add" onclick="scrollToGrid()">Shop now</button>
+            <button class="add" onclick="randomDeal()">Surprise me 🎁</button>
+          </div>
+        </div>
+        <div>
+          <img alt="FSmarket collage" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop" />
+        </div>
+      </div>
+
+      <h2 style="margin:18px 6px">Top picks</h2>
+      <div class="grid" id="grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> FSmarket • Demo storefront UI. Not affiliated with Amazon.</footer>
+
+  <!-- Cart Drawer -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="backdrop" onclick="toggleCart(false)"></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-label="Shopping cart">
+      <header>
+        <strong>Your Cart</strong>
+        <button class="btn" onclick="clearCart()">Clear</button>
+      </header>
+      <div class="cart-items" id="cartItems"></div>
+      <footer>
+        <div class="row" style="margin-bottom:10px"><span class="muted">Subtotal</span><span class="space"></span><strong id="subtotal">₹0</strong></div>
+        <button class="checkout" onclick="checkout()">Proceed to checkout</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // ---- Demo Data ----
+    const PRODUCTS = [
+      {id:1, title:'Wireless Headphones', dept:'Electronics', price:3499, was:4999, img:'https://images.unsplash.com/photo-1518444065433-8be9d7a4afc1?q=80&w=1200&auto=format&fit=crop'},
+      {id:2, title:'Stainless Steel Bottle', dept:'Home & Kitchen', price:899, was:1199, img:'https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1200&auto=format&fit=crop'},
+      {id:3, title:'Gaming Mouse', dept:'Computers', price:1599, was:2499, img:'https://images.unsplash.com/photo-1587202372775-98927b7652d1?q=80&w=1200&auto=format&fit=crop'},
+      {id:4, title:'Cotton T‑Shirt', dept:'Fashion', price:699, was:999, img:'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop'},
+      {id:5, title:'Bluetooth Speaker', dept:'Electronics', price:2299, was:2999, img:'https://images.unsplash.com/photo-1490376840453-5f616fbebe5b?q=80&w=1200&auto=format&fit=crop'},
+      {id:6, title:'Ceramic Mug Set', dept:'Home & Kitchen', price:549, was:799, img:'https://images.unsplash.com/photo-1498804103079-a6351b050096?q=80&w=1200&auto=format&fit=crop'},
+      {id:7, title:'Backpack 25L', dept:'Fashion', price:1899, was:2399, img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop'},
+      {id:8, title:'USB‑C Cable 1m', dept:'Computers', price:299, was:499, img:'https://images.unsplash.com/photo-1517777290870-4e2b1740a9d8?q=80&w=1200&auto=format&fit=crop'},
+      {id:9, title:'Yoga Mat', dept:'Sports & Outdoors', price:1199, was:1699, img:'https://images.unsplash.com/photo-1603988363607-e1e4a66962c7?q=80&w=1200&auto=format&fit=crop'},
+      {id:10, title:'LED Desk Lamp', dept:'Home & Kitchen', price:1599, was:2199, img:'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1200&auto=format&fit=crop'},
+      {id:11, title:'Mechanical Keyboard', dept:'Computers', price:3299, was:4499, img:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop'},
+      {id:12, title:'Running Shoes', dept:'Fashion', price:2799, was:3499, img:'https://images.unsplash.com/photo-1542291026-94f02b26b0b8?q=80&w=1200&auto=format&fit=crop'}
+    ];
+
+    // ---- State ----
+    const state = {
+      q: '',
+      dept: new Set(),
+      price: 'all',
+      cart: JSON.parse(localStorage.getItem('fsm_cart')||'{}')
+    };
+
+    const el = (sel)=>document.querySelector(sel);
+
+    function formatINR(v){return '₹' + v.toLocaleString('en-IN')}
+
+    // ---- Init ----
+    init();
+    function init(){
+      // Year
+      el('#year').textContent = new Date().getFullYear();
+
+      // Departments chips
+      const depts = [...new Set(PRODUCTS.map(p=>p.dept))].sort();
+      const depWrap = el('#departments');
+      depts.forEach(d => {
+        const id = 'dep_'+d.replace(/\W+/g,'_');
+        const label = document.createElement('label');
+        label.className='chip';
+        label.innerHTML = `<input type="checkbox" id="${id}" value="${d}"> ${d}`;
+        depWrap.appendChild(label);
+        label.querySelector('input').addEventListener('change', e=>{
+          if(e.target.checked) state.dept.add(d); else state.dept.delete(d);
+          applyFilters();
+        });
+      });
+
+      // Search
+      el('#q').addEventListener('input', (e)=>{ state.q = e.target.value.trim().toLowerCase(); render() });
+
+      // Price radios
+      document.querySelectorAll('input[name="p"]').forEach(r=>{
+        r.addEventListener('change', e=>{ state.price = e.target.value; render(); })
+      });
+
+      render();
+      updateCartBadge();
+    }
+
+    // ---- Render Grid ----
+    function render(){
+      const wrap = el('#grid');
+      wrap.innerHTML = '';
+      let items = PRODUCTS.filter(p => p.title.toLowerCase().includes(state.q));
+      if(state.dept.size){ items = items.filter(p => state.dept.has(p.dept)); }
+      if(state.price==='lt25') items = items.filter(p=>p.price<2000);
+      if(state.price==='25to50') items = items.filter(p=>p.price>=2000 && p.price<=5000);
+      if(state.price==='gt50') items = items.filter(p=>p.price>5000);
+
+      if(!items.length){
+        wrap.innerHTML = `<div class="card" style="padding:20px"><strong>No results</strong><span class="muted">Try fewer filters or a different search.</span></div>`;
+        return;
+      }
+
+      items.forEach(p=>{
+        const card = document.createElement('article');
+        card.className='card';
+        card.innerHTML = `
+          <div class="img"><img alt="${p.title}" src="${p.img}"/></div>
+          <h3>${p.title}</h3>
+          <p class="price">${formatINR(p.price)} <span class="strike">${formatINR(p.was)}</span></p>
+          <button class="add" onclick='addToCart(${JSON.stringify(p.id)})'>Add to Cart</button>
+        `;
+        wrap.appendChild(card);
+      });
+    }
+
+    function filterProducts(){ state.q = el('#q').value.trim().toLowerCase(); render(); }
+    function scrollToGrid(){ document.getElementById('grid').scrollIntoView({behavior:'smooth'}); }
+    function randomDeal(){
+      const i = Math.floor(Math.random()*PRODUCTS.length);
+      const p = PRODUCTS[i];
+      el('#q').value = p.title.split(' ')[0];
+      filterProducts();
+    }
+
+    // ---- Cart Logic ----
+    function addToCart(id){
+      state.cart[id] = (state.cart[id]||0)+1;
+      persistCart();
+      updateCartBadge();
+      animateAdd();
+    }
+    function removeFromCart(id){ if(state.cart[id]){ delete state.cart[id]; persistCart(); drawCart(); updateCartBadge(); } }
+    function changeQty(id,delta){
+      const q = (state.cart[id]||0)+delta;
+      if(q<=0) delete state.cart[id]; else state.cart[id]=q;
+      persistCart(); drawCart(); updateCartBadge();
+    }
+    function clearCart(){ state.cart={}; persistCart(); drawCart(); updateCartBadge(); }
+    function persistCart(){ localStorage.setItem('fsm_cart', JSON.stringify(state.cart)); }
+    function updateCartBadge(){
+      const total = Object.values(state.cart).reduce((a,b)=>a+b,0);
+      el('#cartCount').textContent = total;
+    }
+
+    function toggleCart(open){
+      const d = el('#drawer');
+      d.classList.toggle('open', !!open);
+      d.setAttribute('aria-hidden', open? 'false':'true');
+      if(open) drawCart();
+    }
+
+    function drawCart(){
+      const box = el('#cartItems');
+      box.innerHTML='';
+      let subtotal = 0;
+      Object.entries(state.cart).forEach(([id,qty])=>{
+        const p = PRODUCTS.find(x=>x.id==id);
+        if(!p) return;
+        subtotal += p.price*qty;
+        const row = document.createElement('div');
+        row.className='cart-item';
+        row.innerHTML = `
+          <img src="${p.img}" alt="${p.title}">
+          <div>
+            <div style="font-weight:600">${p.title}</div>
+            <div class="muted">${formatINR(p.price)} • ${p.dept}</div>
+            <div class="qty" style="margin-top:6px">
+              <button aria-label="Decrease" onclick="changeQty(${p.id},-1)">−</button>
+              <span>${qty}</span>
+              <button aria-label="Increase" onclick="changeQty(${p.id},1)">+</button>
+              <button class="btn" style="margin-left:8px" onclick="removeFromCart(${p.id})">Remove</button>
+            </div>
+          </div>
+          <div style="font-weight:700">${formatINR(p.price*qty)}</div>
+        `;
+        box.appendChild(row);
+      });
+      el('#subtotal').textContent = formatINR(subtotal);
+    }
+
+    function checkout(){
+      if(!Object.keys(state.cart).length){ alert('Your cart is empty.'); return; }
+      alert('Demo checkout — replace with your payment flow.');
+    }
+
+    function animateAdd(){
+      const btn = document.activeElement;
+      if(!btn || !btn.classList.contains('add')) return;
+      btn.animate([
+        { transform:'scale(1)' },
+        { transform:'scale(1.05)' },
+        { transform:'scale(1)' }
+      ], { duration: 220, easing:'ease-out' });
+    }
+
+    // Region (basic demo using Intl API)
+    try {
+      const loc = Intl.DateTimeFormat().resolvedOptions().timeZone || 'your area';
+      el('#region').textContent = 'Deliver to '+loc.replace(/_/g,' ');
+    } catch {}
+  </script>
+</body>
+</html>
